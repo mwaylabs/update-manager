@@ -12,22 +12,25 @@ define(function(require, exports, module) {
 
     var nodeConnection = null;
 
-
-    function callUpdate(updateVersionURL) {
+    /**
+     *
+     * @param updateVersionURL {URL}, URL to the version.json
+     */
+    function callUpdate(config) {
         var globalExtensionDir = null;
 
-        if (!updateVersionURL)
+        if (!config || !config.updateVersionURL)
             throw new Error('invalid params');
 
         //get path of extension folder
         //get rid of the last folder, 
         globalExtensionDir = moduleDirectoryPath.replace(/\/[^\/]+$/, '');
-
+        console.log(globalExtensionDir);
         var nodeFunc = function() {
 
             var promise = nodeConnection.domains.simple.nodeUpdate({
-                updateVersionURL: updateVersionURL,
-                globalExtensionDir: globalExtensionDir
+                updateVersionURL: config.updateVersionURL,
+                extractPath: config.extractPath
             });
 
             promise.fail(function(err) {

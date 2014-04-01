@@ -11,7 +11,6 @@
     var AdmZip = require('adm-zip');
     var mkdirp = require('mkdirp');
 
-    var request = require('request');
 
 
     /**
@@ -25,11 +24,8 @@
             uri: url.parse(options.updateVersionURL),
             port: 8000,
             path: url.parse(options.updateVersionURL).pathname,
-            globalExtensionDir: options.globalExtensionDir
+            extractPath: options.extractPath
         };
-
-        //TODO remove manually set port
-        _options.uri.port = 8000;
 
         _handleUpdateProcess(_options);
     }
@@ -38,21 +34,28 @@
         var parsedVersionFile = null;
         if (options && options.host) {
             //get the remote version file
-            request(options, function (error, res, body) {
-                if (!error) {
-                    try {
-                        parsedVersionFile = JSON.parse(body);
-                        decideGetNewFiles(parsedVersionFile, options);
-                    } catch (err) {
-                        console.log(err);
-                    }
-                } else {
-                    console.log(options);
-                    console.log(error);
-                    console.log('unable to connect');
-                }
+            var chunks = '';
+            try {
+                var req = http.get(options, function (res) {
 
-            });
+                    res.setEncoding('utf8');
+
+                    res.on('data', function (chunk) {
+                        chunks += chunk;
+                    });
+
+                    res.on('end', function () {
+                        parsedVersionFile = JSON.parse(chunks);
+                        decideGetNewFiles(parsedVersionFile, options);
+                    });
+
+                    res.on('error', function () {
+                        console.log('remote version file not found. unable to update');
+                    });
+                });
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 
@@ -60,8 +63,8 @@
 
         var localVersionFile = null;
 
-        //Build global path to the extension folder
-        var filePath = options.globalExtensionDir + '/' + parsedVersionFile.extractPath;
+        //set filepath
+        var filePath = options.extractPath;
 
         try {
             localVersionFile = fs.readFileSync(filePath + 'version.json', 'utf8');
