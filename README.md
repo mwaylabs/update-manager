@@ -20,11 +20,6 @@ everytime the update-manager is called, he compares the local version and the re
 
 `npm install update-manager`
 
-
-`# with flag -S to save it as dependency in your package.json
-npm install -S update-manager`
-
-
 ###How to use
 
     var updateManager = require('update-manager');
@@ -38,3 +33,8 @@ npm install -S update-manager`
     function init() {
         updateManager.update(config);
     }
+
+
+##Licence
+
+update-manager is licenced under the [MIT licence](http://en.wikipedia.org/wiki/MIT_licence).
