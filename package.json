@@ -9,10 +9,7 @@
   "version": "0.1.0",
   "author": "Marco Hanowski, Stefan Buck, Timo Weiß",
   "categories": "utility, update",
-  "engines": {
-    "brackets": ">=0.37.0"
-  },
-    "license": "MIT",
+  "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.4.4",
     "semver": "^2.2.1",
