@@ -1,5 +1,5 @@
 {
-  "name": "updatemanager",
+  "name": "update-manager",
   "description": "",
   "homepage": "http://www.mwaysolutions.com/",
     "repository": {
@@ -9,7 +9,11 @@
   "version": "0.1.0",
   "author": "Marco Hanowski, Stefan Buck, Timo Weiß",
   "categories": "utility, update",
-  "license": "MIT",
+    "licenses": [
+        {
+            "type": "MIT"
+        }
+    ],
   "dependencies": {
     "adm-zip": "^0.4.4",
     "semver": "^2.2.1",
