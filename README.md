@@ -34,7 +34,7 @@ everytime the update-manager is called, he compares the local version and the re
         updateManager.update(config);
     }
 
-
 ##Licence
 
 update-manager is licenced under the [MIT licence](http://en.wikipedia.org/wiki/MIT_licence).
+
