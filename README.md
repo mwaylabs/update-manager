@@ -21,8 +21,8 @@ everytime the update-manager is called, he compares the local version and the re
 `npm install update-manager`
 
 
-`# with flag -S to save it as dependency in your package.json
-npm install -S update-manager`
+`# with flag -S to save it as dependency in your package.json`
+`npm install -S update-manager`
 
 
 ###How to use
