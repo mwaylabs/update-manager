@@ -5,9 +5,13 @@
 There are several different use-cases. For example you can use it to deliver continuously new versions of your files. You can also use it for lazy loading.
 
 ##How it works
-The usage is quit simple. You simply call the update-manager with a config object which contains a `extractPat`and a URL to a `version.json`.
+The usage is quit simple. You simply call the update-manager with a config object which contains a `extractPath` and a URL to a `version.json`.
 
-everytime the update-manager is called, he compares the local version and the remote version. If the remote version is greater than the local, the download starts automatically.
+Everytime the update-manager is called, he compares the local version and the remote version. If the remote version is greater than the local, the download starts automatically.
+
+###Installation
+
+`npm install update-manager`
 
 ###The version file
 
@@ -15,10 +19,6 @@ everytime the update-manager is called, he compares the local version and the re
         "version": "1.1.1",
         "updateURL": "http://example.com/path/to/your/files.zip"
     }
-
-###Installation
-
-`npm install update-manager`
 
 ###How to use
 
