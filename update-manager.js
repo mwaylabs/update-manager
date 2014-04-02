@@ -5,12 +5,14 @@
     "use strict";
     var fs = require('fs');
     var http = require('http');
+    var path = require('path');
     var url = require('url');
     var semver = require('semver');
     var AdmZip = require('adm-zip');
     var mkdirp = require('mkdirp');
 
 
+    var doLog = false;
 
     /**
      * parses the given URL and passes to handler
@@ -23,8 +25,12 @@
             uri: url.parse(options.updateVersionURL),
             port: 8000,
             path: url.parse(options.updateVersionURL).pathname,
-            extractPath: options.extractPath
+            extractPath: options.extractPath,
+            error: options.error || function(){},
+            success: options.success || function(){}
         };
+
+        doLog = options.log || false;
 
         _handleUpdateProcess(_options);
     }
@@ -49,11 +55,14 @@
                     });
 
                     res.on('error', function () {
-                        console.log('remote version file not found. unable to update');
+                        var e = 'remote version file not found. unable to update';
+                        log(e);
+                        options.error(e);
                     });
                 });
             } catch (e) {
-                console.log(e);
+                log(e);
+                options.error(e);
             }
         }
     }
@@ -63,15 +72,15 @@
         var localVersionFile = null;
 
         //set filepath
-        var filePath = options.extractPath;
+        var filePath = path.normalize(options.extractPath);
 
         try {
             localVersionFile = fs.readFileSync(filePath + 'version.json', 'utf8');
         } catch (e) {
-            console.log(e);
-            console.log('try to get the files from remote');
+            log(e);
+            log('try to get the files from remote');
             // if there is no version.json locally, go and get it
-            _getZipFile(parsedVersionFile, filePath);
+            _getZipFile(parsedVersionFile, filePath, options);
             return;
         }
 
@@ -79,19 +88,20 @@
         try {
             localVersionFile = JSON.parse(localVersionFile);
         } catch (e) {
-            console.log(e);
-            _getZipFile(parsedVersionFile, filePath);
-            console.log('try to get the files from remote');
+            log(e);
+            _getZipFile(parsedVersionFile, filePath, options);
+            log('try to get the files from remote');
             return;
         }
 
 
-        _helperDecisionMaker(parsedVersionFile, localVersionFile, filePath);
+        _helperDecisionMaker(parsedVersionFile, localVersionFile, filePath, options);
 
     }
 
-    function _helperDecisionMaker(parsedVersionFile, localVersionFile, filePath) {
+    function _helperDecisionMaker(parsedVersionFile, localVersionFile, filePath, options) {
         if (!parsedVersionFile || !localVersionFile) {
+            options.error('corrupt online and offline version.json file');
             return;
         }
 
@@ -100,7 +110,7 @@
 
         // if the local version number is invalid, get the new files
         if (!localVersionNum) {
-            _getZipFile(parsedVersionFile, filePath);
+            _getZipFile(parsedVersionFile, filePath, options);
             return;
         }
 
@@ -112,14 +122,15 @@
         //compare version numbers
         if (semver.lt(localVersionNum, remoteVersionNum)) {
             //update files
-            _getZipFile(parsedVersionFile, filePath);
+            _getZipFile(parsedVersionFile, filePath, options);
 
         } else {
             //everything is up-to-date, do nothing
+            options.success(1, 'everything is up-to-date, do nothing');
         }
     }
 
-    function _getZipFile(parsedVersionFile, filePath) {
+    function _getZipFile(parsedVersionFile, filePath, options) {
         var _options = {
             uri: url.parse(parsedVersionFile.updateURL),
             port: parsedVersionFile.port,
@@ -134,15 +145,17 @@
         try {
             mkdirp.sync(filePath);
         } catch (e) {
-            console.log(e);
+            log(e);
+            options.error(e);
+            return;
         }
 
-        console.log(filePath);
+        log(filePath);
         oldFiles.addLocalFolder(filePath);
 
         oldFiles.toBuffer();
 
-        var zipName = filePath + Date.now() + '.zip';
+        var zipName = path.normalize(filePath + Date.now() + '.zip');
         oldFiles.writeZip(zipName);
 
         try {
@@ -174,25 +187,37 @@
                     //unlinkFile(zipName);
                     fs.unlink(zipName, function (err) {
                         if (err) throw err;
-                        console.log('successfully deleted', zipName);
+                        log('successfully deleted', zipName);
+                        options.success(2, 'updated: ' + filePath);
                     });
                 });
             });
 
             req.on('error', function (err) {
-                console.log(err);
+                log(err);
                 //restore old files
                 zip.extractAllTo(zipName, true);
                 //unlinkFile(zipName);
                 fs.unlink(zipName, function (err) {
-                    if (err) throw err;
-                    console.log('successfully deleted', zipName);
+                    if (err) {
+                        options.error(err);
+                    }
+                    log('successfully deleted', zipName);
+                    options.error('something went wrong, revert to old version');
                 });
             });
 
             req.end();
         } catch (e) {
-            console.log(e);
+            log(e);
+            options.error(e);
+        }
+    }
+
+
+    function log(){
+        if(doLog){
+            console.log.apply(console, arguments);
         }
     }
 

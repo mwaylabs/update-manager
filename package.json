@@ -6,8 +6,8 @@
         "type": "git",
         "url": "https://github.com/mwaylabs/update-manager.git"
     },
-  "version": "0.1.0",
-  "author": "Marco Hanowski, Stefan Buck, Timo Weiß",
+  "version": "0.1.1",
+  "author": "Timo Weiß",
   "categories": "utility, update",
     "licenses": [
         {
