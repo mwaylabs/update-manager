@@ -5,7 +5,7 @@
 There are several different use-cases. For example you can use it to deliver continuously new versions of your files. You can also use it for lazy loading.
 
 ##How it works
-The usage is quit simple. You simply call the update-manager with a config object which contains a `extractPath` and a URL to a `version.json`.
+The usage is quite simple. You simply call the update-manager with a config object which contains a `extractPath` and a URL to a `version.json`.
 
 Everytime the update-manager is called, he compares the local version and the remote version. If the remote version is greater than the local, the download starts automatically.
 
