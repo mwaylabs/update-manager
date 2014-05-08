@@ -67,6 +67,9 @@ function _handleUpdateProcess(reqOpt, options) {
                     options.error(e);
                 });
             });
+            req.on('error', function(e) {
+                options.error(e)
+            });
         } catch (e) {
             log(e);
             options.error(e);
@@ -208,9 +211,9 @@ function _getZipFile(parsedVersionFile, filePath, options) {
                 });
             });
         });
-
         req.on('error', function (err) {
             log(err, '!!!!!!');
+            options.error(err);
             //restore old files
             oldFiles.extractAllTo(zipName, true);
             //unlinkFile(zipName);
