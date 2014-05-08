@@ -30,7 +30,6 @@ function update(options) {
 
 
     doLog = options.log || false;
-    console.log('should i log: ', doLog);
     log(doLog);
     _handleUpdateProcess(reqOpt, options);
 }
@@ -38,7 +37,6 @@ function update(options) {
 function _handleUpdateProcess(reqOpt, options) {
     var parsedVersionFile = null;
     log('_handleUpdateProcess', reqOpt);
-    console.log('_handleUpdateProcess');
     if (reqOpt && reqOpt.host) {
         //get the remote version file
         var chunks = '';
@@ -49,19 +47,16 @@ function _handleUpdateProcess(reqOpt, options) {
                 res.setEncoding('utf8');
 
                 res.on('data', function (chunk) {
-                    console.log('1', chunk);
                     chunks += chunk;
                 });
 
                 res.on('end', function () {
-                    console.log('end', chunks);
                     log('req. end', chunks);
                     parsedVersionFile = JSON.parse(chunks);
                     decideGetNewFiles(parsedVersionFile, options);
                 });
 
                 res.on('error', function () {
-                    console.log('error');
                     var e = 'remote version file not found. unable to update';
                     log(e);
                     options.error(e);
@@ -214,6 +209,7 @@ function _getZipFile(parsedVersionFile, filePath, options) {
         req.on('error', function (err) {
             log(err, '!!!!!!');
             options.error(err);
+            log('restoring old files');
             //restore old files
             oldFiles.extractAllTo(zipName, true);
             //unlinkFile(zipName);
