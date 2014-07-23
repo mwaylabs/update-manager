@@ -83,7 +83,7 @@ function decideGetNewFiles(parsedVersionFile, options) {
     var filePath = path.normalize(options.extractPath);
 
     try {
-        localVersionFile = fs.readFileSync(filePath + 'version.json', 'utf8');
+        localVersionFile = fs.readFileSync(filePath + 'package.json', 'utf8');
     } catch (e) {
         log(e);
         log('try to get the files from remote');
